@@ -29,3 +29,15 @@ if __name__ == '__main__':
     #columns = np.array(['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'type'])
     columns = np.array(['花萼长度', '花萼宽度', '花瓣长度', '花瓣宽度', '类型'])
     data.rename(columns = dict(list(zip(np.arange(5), columns))), inplace = True)    #修改data列名并替换
+    #print(data.head(5))
+    x = data[columns[:-1]]
+    y = data[columns[-1]]
+    
+    if stype == 'pca':
+        pca = PCA(n_components = 2, whiten = True, random_state = 0)
+        x = pca.fit_transform(x)
+        print('各方向方差：', pca.explained_variance_)
+        print('方差所占比例：', pca.explained_variance_ratio_)
+        x1_label, x2_label = '组分1', '组分2'
+        title = '鸢尾花数据PCA'
+    else:

@@ -46,7 +46,7 @@ if __name__ == '__main__':
         fs.fit(x, y)
         idx = fs.get_support(indices = True)
         print('fs.get_support() = ', idx)
-        x = x[idx]
+        x = x[columns[idx]]
         x = x.values    # 为下面使用方便，DataFrame转换成ndarray
         x1_label, x2_label = columns[idx]
         title = '鸢尾花数据特征选择'
@@ -75,3 +75,28 @@ if __name__ == '__main__':
     print('训练级精度：', metrics.accuracy_score(y, y_hat))
     y_test_hat = model.predict(x_test)
     print('测试集精度：', metrics.accuracy_score(y_test, y_test_hat))
+    
+    N, M = 500, 500
+    x1_min, x1_max = extend(x[:, 0].min(), x[:, 0].max())    #第1个主成分——extend
+    x2_min, x2_max = extend(x[:, 1].min(), x[:, 1].max())    #第2个主成分——extend
+    t1 = np.linspace(x1_min, x1_max, N)
+    t2 = np.linspace(x2_min, x2_max, M)
+    x1, x2 = np.meshgrid(t1, t2)    #生成网格采样点
+    x_show = np.stack((x1.flat, x2.flat), axis = 1)    #测试点
+    y_hat = model.predict(x_show)   #预测值
+    y_hat = y_hat.reshape(x1.shape)    #与输入形状相同
+    plt.figure(facecolor='w')
+    plt.pcolormesh(x1, x2, y_hat, cmap = cm_light)    #预测值显示
+    plt.scatter(x[:, 0], x[:, 1], s=30, c=y, edgecolors='k', cmap=cm_dark)  # 样本绘制
+    plt.xlabel(x1_label, fontsize = 12)
+    plt.ylabel(x2_label, fontsize = 12)
+    plt.xlim(x1_min, x1_max)
+    plt.ylim(x2_min, x2_max)
+    plt.grid(b=True, ls=':', color='k')
+    
+    patchs = [mpatches.Patch(color='#77E0A0', label='Iris-setosa'),
+              mpatches.Patch(color='#FF8080', label='Iris-versicolor'),
+              mpatches.Patch(color='#A0A0FF', label='Iris-virginica')]
+    plt.legend(handles=patchs, fancybox=True, framealpha=0.8, loc='lower right')
+    plt.title('鸢尾花Logistic回归分类效果', fontsize=15)
+    plt.show()
